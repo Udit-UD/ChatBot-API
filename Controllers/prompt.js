@@ -15,16 +15,10 @@ export const  sendMsgToOpenAI = async(req, res) => {
       });
     }
 
-    const message = new Prompt({
-      sender: "user", 
-      text: prompt
-    });
-    await message.save();
-    conversation.history.push(message);
     
     const openai = new OpenAI({
       apiKey: process.env.API_KEY,
-  });
+    });
     const completion = await openai.chat.completions.create({
       messages: [{ role: "user", content: prompt }],
       model: "gpt-3.5-turbo",
@@ -32,6 +26,13 @@ export const  sendMsgToOpenAI = async(req, res) => {
     });
     const finalRes = completion.choices[0].message.content;
 
+    const message = new Prompt({
+      sender: "user", 
+      text: prompt
+    });
+    await message.save();
+    conversation.history.push(message);
+    
     const reply = new Prompt({
       sender: "assistant", 
       text: finalRes
